@@ -16,6 +16,7 @@
   "main": "index.html",
   "dependencies": {
     "core-js": "^3.6.5",
+    "node-matlab": "^1.2.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "ws": "^8.4.0"

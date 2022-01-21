@@ -36,10 +36,17 @@ export default {
         }
       }
     },
+    sendToConnected(connections) {
+      connections;
+    },
+    onMatlabMessage(data) {
+      data;
+    },
   },
   mounted() {
     this.onConnectionChange([]);
-    server.bindListener(this.onConnectionChange);
+    server.bindConnectionsListener(this.onConnectionChange);
+    server.bindMessageListener(this.onMatlabMessage);
   },
 };
 </script>

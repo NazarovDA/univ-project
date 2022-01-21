@@ -1,10 +1,15 @@
 const server = {
   /** @type {typeof import('ws')} */
   ws: null,
-  bindListener(connChange) {
+  bindConnectionsListener(connChange) {
     this._onConnectionChange = connChange;
   },
+  bindMessageListener(messageListener) {
+    // добавляем слушателя новых данных из матлаба
+    this._onMessage = messageListener;
+  },
   _onConnectionChange() {},
+  _onMessage() {},
 };
 
 function init() {
@@ -35,6 +40,12 @@ function init() {
               return;
             }
           }
+
+          if (jsonData.matlabInfo) {
+            // если есть информация от матлаба, то отправляем ее в обработчик
+            server._onMessage(jsonData);
+          }
+
           connections.push(data);
           server._onConnectionChange(connections);
         }
