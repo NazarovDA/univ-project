@@ -3,46 +3,13 @@ const dns = require("dns");
 const os = require("os");
 const fs = require("fs");
 
-const matlab = require("node-matlab");
-
+const path = require("path");
+const matlab = require("./matlab-parse");
 const { host, name, port, timeoutTime } = getSettings();
 
-/** @type {typeof import('ws')} */
-let connection;
+/** @typedef {import('../typings').ServerMessage} ServerMessage */
 
-// eslint-disable-next-line no-unused-vars
-function execute_matlab_code(file) {
-  try {
-    matlab
-      .run(file)
-      .then((result) => send_matlab_data(result))
-      .catch((error) => send_matlab_error(error));
-  } catch (exception) {
-    // if no matlab on pc
-    send_matlab_error("there is no matlab on that pc");
-  }
-}
-
-function send_matlab_error(error) {
-  let message = {
-    name,
-    ip: getIP2(),
-    matlabError: error,
-  };
-
-  connection.send(JSON.stringify(message));
-}
-
-function send_matlab_data(data) {
-  let message = {
-    name,
-    ip: getIP2(),
-    matlabInfo: data,
-  };
-
-  connection.send(JSON.stringify(message));
-}
-
+/** @returns {{ host: string, name: string, port: number, timeoutTime: number }} */
 function getSettings() {
   try {
     const data = JSON.parse(fs.readFileSync("settings.json", "utf-8"));
@@ -60,7 +27,7 @@ function getSettings() {
   } catch (e) {
     return {
       host: "localhost",
-      name: "computer4",
+      name: "computer3",
       port: 8080,
       timeoutTime: 5000,
     };
@@ -87,8 +54,11 @@ function init() {
   webSocket.on("open", async () => {
     let selfIp = await getIP2();
     connectionComplete = true;
-    Object.assign(connection, webSocket);
     webSocket.send(JSON.stringify({ name, ip: selfIp }));
+
+    setInterval(() => {
+      webSocket.send(JSON.stringify({ name, ip: selfIp, matlabInfo: "kekew" }));
+    }, 5000);
   });
 
   webSocket.on("error", (error) => {
@@ -106,13 +76,29 @@ function init() {
     }
   });
 
-  webSocket.on("message", (data) => {
-    if (data.file_path) {
-      // changes are possible
-      execute_matlab_code(data.file_path);
-    } else if (data.string_matlab_code) {
-      // changes are possible
-      execute_matlab_code(data.string_matlab_code);
+  webSocket.on("message", async (data) => {
+    const jsonData = JSON.parse(data);
+    
+    console.log(jsonData);
+
+    if (jsonData.filename && jsonData.text) {
+      const filepath = path.join(os.tmpdir(), jsonData.filename);
+
+      await fs.writeFile(filepath, data.text);
+
+      const matlabProcess = matlab.execute(JSON.parse(filepath));
+
+      matlabProcess.stdout.on("data", (data) => {
+        webSocket.send(
+          JSON.stringify({
+            matlabInfo: data,
+          })
+        );
+      });
+
+      await matlabProcess.close;
+
+      await fs.unlink(filepath);
     }
   });
 }
