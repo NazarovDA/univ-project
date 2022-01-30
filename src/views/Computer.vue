@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{ computer.name }}
+    <!--{{ computer.name }}-->
     <SendFile @file="sendToComputer" />
   </div>
 </template>
@@ -16,7 +16,14 @@ export default {
   components: { SendFile },
   props: {
     /** @type {Computer} */
-    computer: () => true,
+    ip: () => true,
+  },
+  params: {},
+  query: {
+    /** @type {String} */
+    ip: () => true,
+    /** @type {String} */
+    name: () => true,
   },
   data() {
     return {};
@@ -32,6 +39,10 @@ export default {
     },
 
     messageListener() {},
+  },
+
+  created() {
+    console.log("query", this.$route.query);
   },
 
   mounted() {

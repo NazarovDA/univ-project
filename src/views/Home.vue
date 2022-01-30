@@ -75,7 +75,9 @@ export default {
     /** @param {{ filename: string, text: string }} file */
     sendToAllConnected(file) {
       for (const computer of this.computers) {
-        if (!computer.connected) {continue}
+        if (!computer.connected) {
+          continue;
+        }
         try {
           console.log(file);
           computer.connection.connection.send(JSON.stringify(file));
@@ -89,14 +91,13 @@ export default {
 
     */
     goToComputer(computer) {
-      console.log(computer);
 
       if (computer.connected) {
         this.$router.push({
-          name: "Computer",
-          props: { computer },
-          params: { computer },
-          query: { computer },
+          path: "/computer",
+          props: { ip: computer.ip, name: computer.name },
+          params: { ip: computer.ip, name: computer.name },
+          query: { ip: computer.ip, name: computer.name },
         });
       }
     },
