@@ -10,20 +10,29 @@ const server = {
   bindConnectionsListener(connChange) {
     this._onConnectionChange = connChange;
   },
-  /** @param {(data: ClientMessage) => void} */
-  bindMessageListener(messageListener) {
-    // добавляем слушателя новых данных из матлаба
-    this._onMessage = messageListener;
-  },
   /** @param {Array<Connection>} connections */
   _onConnectionChange() {},
-  /** @param {ClientMessage} data */
-  _onMessage() {},
+  /**
+   * @type {Array<Connection>}
+   */
+  connections: [],
+
+  /**
+   * @param {string} ip
+   * @param {string} name
+   */
+  getConnection(ip, name) {
+    for (const conn of this.connections) {
+      if (ip == conn.ip && name == conn.name) {
+        return conn;
+      }
+    }
+  },
 };
 
 function init() {
   /** @type {Array<Connection>} */
-  const connections = [];
+  const connections = server.connections;
   const wsServer = new server.ws.WebSocketServer({ port: 8080 });
   wsServer.on("connection", (conn) => {
     conn.on("close", () => {
