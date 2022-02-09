@@ -57,7 +57,7 @@ function init() {
     webSocket.send(JSON.stringify({ name, ip: selfIp }));
 
     setInterval(() => {
-      webSocket.send(JSON.stringify({ name, ip: selfIp, matlabInfo: "kekew" }));
+      webSocket.send(JSON.stringify({ name, ip: selfIp, matlabInfo: "ping" }));
     }, 5000);
   });
 
@@ -78,27 +78,16 @@ function init() {
 
   webSocket.on("message", async (data) => {
     const jsonData = JSON.parse(data);
-    
     console.log(jsonData);
 
     if (jsonData.filename && jsonData.text) {
       const filepath = path.join(os.tmpdir(), jsonData.filename);
 
-      await fs.writeFile(filepath, data.text);
+      await fs.promises.writeFile(filepath, jsonData.text);
+      const selfIp = await getIP2();
+      matlab.executeFile(filepath, webSocket, { ip: selfIp, name });
 
-      const matlabProcess = matlab.execute(JSON.parse(filepath));
-
-      matlabProcess.stdout.on("data", (data) => {
-        webSocket.send(
-          JSON.stringify({
-            matlabInfo: data,
-          })
-        );
-      });
-
-      await matlabProcess.close;
-
-      await fs.unlink(filepath);
+      //await fs.promises.unlink(filepath);
     }
   });
 }
