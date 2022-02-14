@@ -52,6 +52,7 @@ function init() {
   let connectionComplete = false;
 
   webSocket.on("open", async () => {
+    console.log("клиент подключен");
     let selfIp = await getIP2();
     connectionComplete = true;
     webSocket.send(JSON.stringify({ name, ip: selfIp }));
@@ -70,6 +71,7 @@ function init() {
   });
 
   webSocket.on("close", () => {
+    console.log("подключение закрыто");
     if (connectionComplete) {
       connectionComplete = false;
       setTimeout(init, timeoutTime);
@@ -93,3 +95,5 @@ function init() {
 }
 
 init();
+console.log("клиент запущен");
+console.log("config: ", { host, name, port, timeoutTime });
