@@ -41,7 +41,15 @@ function executeFile(filepath, ws, { ip = "0.0.0.0", name = "computer" }) {
   child.stdout.on("close", () => {
     console.log(a);
   });
-  child.stderr.on("data", (chunk) => console.log(chunk.toString()));
+  child.stderr.on("data", (chunk) => {
+    console.log(chunk.toString());
+    const answer = {
+      name,
+      ip,
+      ErrorInfo: chunk.toString(),
+    };
+    ws.send(JSON.stringify(answer));
+  });
 }
 
 module.exports = {

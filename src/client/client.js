@@ -57,7 +57,7 @@ function init() {
     webSocket.send(JSON.stringify({ name, ip: selfIp }));
 
     setInterval(() => {
-      webSocket.send(JSON.stringify({ name, ip: selfIp, matlabInfo: "ping" }));
+      webSocket.send(JSON.stringify({ name, ip: selfIp, ping: Date.now() }));
     }, 5000);
   });
 
