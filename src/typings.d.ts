@@ -16,6 +16,8 @@ export interface ClientMessage {
     name?: string;
     ip?: string;
     matlabInfo?: string;
+    ErrorInfo?: string;
+    ping?: number; // Date.now()
 }
 
 export interface ServerMessage {

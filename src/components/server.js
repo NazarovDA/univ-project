@@ -48,17 +48,19 @@ function init() {
       try {
         /** @type {ClientMessage} */
         const jsonData = JSON.parse(data);
-
-        if (jsonData.matlabInfo) {
+        console.debug("get", jsonData);
+        if (jsonData.matlabInfo || jsonData.ErrorInfo) {
+          console.debug("info or error");
           // если есть информация от матлаба, то отправляем ее в обработчик
           //server._onMessage(jsonData);
           for (const connection of connections) {
             if (connection.connection == conn) {
               if (typeof connection.messageListener === "function") {
+                console.debug("before listener");
                 connection.messageListener(jsonData);
               } else {
                 console.log(jsonData);
-                conn.send(JSON.stringify({ data: "ans" }));
+                conn.send(JSON.stringify({ data: "got it" }));
               }
               break;
             }

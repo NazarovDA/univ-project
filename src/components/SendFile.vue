@@ -4,8 +4,12 @@
     <textarea
       id="text"
       v-model="text"
-      v-on:keypress.enter="sendText"
+      @keydown.ctrl.enter="sendText"
+      rows="15"
+      cols="50"
     ></textarea>
+    <button @click="clearText()">clear field</button>
+    <button @click="send()">send data from field</button>
   </div>
 </template>
 
@@ -29,6 +33,14 @@ export default {
       });
     },
 
+    clearText() {
+      this.text = "";
+    },
+
+    send() {
+      this.createFile(this.text);
+    },
+
     handleFileUpload() {
       let file = this.$refs.file.files[0];
       let reader = new FileReader();
@@ -36,7 +48,8 @@ export default {
       reader.readAsText(file, "utf-8");
 
       reader.onload = () => {
-        this.createFile(reader.result, file.name);
+        //this.createFile(reader.result, file.name);
+        this.text = reader.result;
       };
       reader.onerror = console.error;
     },

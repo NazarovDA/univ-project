@@ -91,7 +91,6 @@ export default {
 
     */
     goToComputer(computer) {
-
       if (computer.connected) {
         this.$router.push({
           path: "/computer",

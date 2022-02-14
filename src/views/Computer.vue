@@ -5,11 +5,12 @@
   </div>
 
   <div class="messages">
-    <ol>
+    <ul>
       <li v-for="message in messages" :key="message.id">
-        {{ message.data }}
+        <div class="data" v-if="message.data">{{ message.data }}</div>
+        <div class="error" v-else>{{ message.error }}</div>
       </li>
-    </ol>
+    </ul>
   </div>
 </template>
 
@@ -60,7 +61,9 @@ export default {
       this.messages.push({
         id,
         data: message.matlabInfo,
+        error: message.ErrorInfo,
       });
+      this.messages = this.messages.slice(-50);
     },
   },
 
@@ -77,4 +80,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.error {
+  color: crimson;
+}
+.data {
+  color: #000000;
+}
+</style>
